@@ -634,9 +634,9 @@ outine. */
 
 	///////////dynamic allocation of placn memory -- no limit to number of files 071322///////////
 	//now allocate memory for placn array
-	placn = (char *)malloc(placn, 2 * 27 * numfil * sizeof(char));
-	ext1 = (char *)malloc(ext1, 4 * 2 * numfil * sizeof(char));
-	ext3 = (char *)malloc(ext3, 4 * 2 * numfil * sizeof(char));
+	placn = (char *)malloc(2 * 27 * numfil * sizeof(char));
+	ext1 = (char *)malloc(4 * 2 * numfil * sizeof(char));
+	ext3 = (char *)malloc(4 * 2 * numfil * sizeof(char));
 	/////////////////////////////////////////////////////////////////////////////////////////
 
 	/*
