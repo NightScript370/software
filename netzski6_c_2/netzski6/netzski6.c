@@ -19,6 +19,7 @@
 #include "f2c.h"
 #include <conio.h>
 #include <malloc.h>
+#include <stdbool.h>
 
 /* Common Block Declarations */
 
@@ -63,7 +64,7 @@ short Cint( double x );
 char strarr[4][100];
 double cd, pi;
 
-logical FixProfHgtBug = FALSE_; //added 101520 to fix the bug in newreadDTM that recorded the 
+logical FixProfHgtBug = false; //added 101520 to fix the bug in newreadDTM that recorded the 
 						   //ground height and not the calculation height with the added observer height
 						   //030320 -- found that bat file is most reliable recording to height + observer height
 						   //          and even if it errs, it errs to lower height which is better
@@ -265,11 +266,11 @@ logical FixProfHgtBug = FALSE_; //added 101520 to fix the bug in newreadDTM that
 	char fnam[255] = "";
 	short nweatherflag = 0;
 	short adhocflag = 0;
-	logical FindWinter = TRUE_; //version 18 way of determining the winter months
-	logical EnableSunriseInv = FALSE_; //flag to subtract time for suspected inversion at this day
-	logical EnableSunsetInv = FALSE_; //flag to subtract time for suspected inversion at this day
+	bool FindWinter = true; //version 18 way of determining the winter months
+	bool EnableSunriseInv = false; //flag to subtract time for suspected inversion at this day
+	bool EnableSunsetInv = false; //flag to subtract time for suspected inversion at this day
 
-	logical ReadTemps = TRUE_;  //true to read from netzskiy.tme, false to read directly from WorldClim binary files
+	bool ReadTemps = true;  //true to read from netzskiy.tme, false to read directly from WorldClim binary files
 	doublereal AddTemp = 0;
 	doublereal TRfudge = 1.0; //0.95;//increasing positive lapse rate will lower the TR as well as the total atm refraction
 	doublereal TRfudgeVis = 1.0;
@@ -280,8 +281,8 @@ logical FixProfHgtBug = FALSE_; //added 101520 to fix the bug in newreadDTM that
 	static doublereal vbwexp;
 	static char fndynum[255] = "";
 	static char doclin[255] = "";
-	static logical flagdynum = FALSE_;	//used for special case of Edmonton observations
-	static logical showCalc = FALSE_;  //diagnostic variable to show details of refraction iterations
+	static bool flagdynum = false;	//used for special case of Edmonton observations
+	static bool showCalc = false;  //diagnostic variable to show details of refraction iterations
 	static short yrtst;
 	static short dynum; //used for Edmonton observations
 	static double Tobs; //uwed for Edmonton observations, but can be extended to user inputed ground temperature
@@ -293,7 +294,7 @@ logical FixProfHgtBug = FALSE_; //added 101520 to fix the bug in newreadDTM that
 	static doublereal al1o_2;
 	static doublereal alt1_2;
 	static integer nloops_2;
-	static logical Diagnostics = FALSE_;
+	static bool Diagnostics = false;
 
 	//static short DTMType = -1;
 	static integer distlim = 5;
@@ -458,8 +459,8 @@ outine. */
     pi2 = pi * 2.;
     ch = 12. / pi;
     hr = 60.;
-    geo = FALSE_;
-    nointernet = TRUE_;
+    geo = false;
+    nointernet = true;
 /* 		Average radius of Earth in km */
     rearth = 6356.766f;
 /* 		vdW dip angle vs height polynomial fit coefficients */
@@ -544,7 +545,7 @@ outine. */
 		do_fio(&c__1, (char *)&intflag, (ftnlen)sizeof(integer));
 		e_rsfe();
 		if (intflag == 1) {
-			nointernet = FALSE_;
+			nointernet = false;
 		}
 		cl__1.cerr = 0;
 		cl__1.cunit = 1;
@@ -568,29 +569,22 @@ outine. */
 	{
 		fgets_CR(doclin, 255, stream); //read in line of text containing the file name of the daynumber file
 		strcpy( fndynum, doclin );
-		flagdynum = TRUE_;
+		flagdynum = true;
 		fclose (stream);
 	}
 
 	//adhoc flags: subtracts 15 seconds under special conditions for sunrises
 	// adds 15 seconds under special conditions for sunsets
 
-	adhocrise = TRUE_;
-	adhocset = FALSE_;
+	adhocrise = true;
+	adhocset = false;
 	//read file that determines the sunrise adhoc fix value
 	//if file doesn't exist, then use initialized value for adhocrise
 	sprintf(fnam,"%s%s", drivlet, ":/jk/adhocflag.tmp");
 	if (stream = fopen( fnam, "r"))
 	{
 		fscanf(stream,"%d\n", &adhocflag);
-		if (adhocflag == 1)
-		{
-			adhocrise = TRUE_;
-		}
-		else
-		{
-			adhocrise = FALSE_;
-		}
+		adhocrise = (adhocflag == 1);
 		fclose (stream);
 	}
 
@@ -624,7 +618,7 @@ outine. */
     do_lio(&c__5, &c__1, (char *)&geotd, (ftnlen)sizeof(doublereal));
     e_rsle();
     if (nzskflg <= -4) {
-	geo = TRUE_;
+	geo = true;
     } else {
 	geotd = 2.;
     }
@@ -760,7 +754,7 @@ outine. */
 	if (fabs(kmxo) > 80 && fabs(kmyo) > 80 && geotd == 0)
 	{
 		//these are ITM coordinates for EY location
-		geo = FALSE_;
+		geo = false;
 		geotd = 2;
 	}
 
@@ -842,15 +836,10 @@ outine. */
 	e_rsle();
 	///////////////////////////////////////////////////////////////////////////////////////
 
-	astro = FALSE_;
+	astro = false;
 	if (nsetflag == 2 || nsetflag == 3) {
-	    astro = TRUE_;
-	    if (nsetflag == 2) {
-		nsetflag = 0;
-	    }
-	    if (nsetflag == 3) {
-		nsetflag = 1;
-	    }
+	    astro = true;
+		nsetflag -= 2;
 	}
 
 	if (nsetflag == 0) {
@@ -1010,7 +999,7 @@ alem */
 /*                                  'mean atmospheric temperature (degrees Celsius) */
 	stepsec = 2.5f;
 /*                                  'step size in seconds */
-	nofiles = FALSE_;
+	nofiles = false;
 /*                                   =.TRUE. to turn off neighborhood files (automatic for internet calculatio
 ns) */
 /*                                   =.FALSE. to turn on writing of neighborhood files */
@@ -1019,8 +1008,8 @@ ns) */
 /*       '(Astronomical Almanac, 1996, p. C-24) */
 /*       Addhoc fixes: (15 second fixes based on netz observations at Neveh Yaakov) */
 /* 		As of Version 16, ADHOCRISE = .FALSE. */
-//	adhocrise = TRUE_; //TRUE_;
-//	adhocset = FALSE_;
+//	adhocrise = true; //true;
+//	adhocset = false;
 /* -------------------------------------------------------------------------------------- */
 	if (nsetflag == 0) {
 	    nloop = 72;
@@ -1825,7 +1814,7 @@ L670:
 				{
 					tk = -9999;
 					p = 1013.25;
-					showCalc = FALSE_;
+					showCalc = false;
 
 					//read in line of data, if year and daynumber match, use the temperature and pressure
 					fgets_CR( doclin, 255, stream );
@@ -1853,7 +1842,7 @@ L670:
 							{
 								printf("found temperature dy, yr, Tobs, p, tmin = %f, %d, %f, %f, %f\n", dy, nyear, tk, p, tkmin);
 								getch();
-							    showCalc = TRUE_; //flag to show the details of the calculation and compare for using just tk
+							    showCalc = true; //flag to show the details of the calculation and compare for using just tk
 								nloops_2 = 0;
 							}
 							break;
@@ -2070,7 +2059,7 @@ L687:
 			vdwsf = p  / tk; //pressure and temeprature dependence of ESAA 3.283 
 			vdwrefr = 1.0;
 			vbweps = 1.0;
-			adhocrise = FALSE_;
+			adhocrise = false;
 			a1 = (288.15/tk) * (ref + refrac1) * cd; //a1 in radians
 			air = (90 + eps) * cd + a1; //air in radians
 			trbasis = (288.15/tk) * p * 8.15f * 1e3f * .0277f / (288.15 * 288.15 * 3600);
@@ -2137,7 +2126,7 @@ L700:
 /* *************************BEGIN SUNSET WINTER ADHOC FIX************************ */
 			//new of version 18 -- determine portion of year prone to inversion layers using daylength
 			if (adhocset) {
-				EnableSunsetInv = FALSE_;
+				EnableSunsetInv = false;
 				if (FindWinter) {
 					DayLength = 2 * sr1;
 					//make sure that it is cold by checking miniimum temperature for the relevant month
@@ -2148,19 +2137,19 @@ L700:
 					mTemp = floor(9 * (kTemp + dy) / 275 + 0.98);
 					if (DayLength <= MaxWinLen) { //&& mint[mTemp-1] <= WinTemp) {
 						//nacurr = 15;
-						EnableSunsetInv = TRUE_;
+						EnableSunsetInv = true;
 					}
 				}else{
 					if (lt >= 0. && nweather == 0 && (dy <= (doublereal) ns3 
 						|| dy >= (doublereal) ns4) ) {
 		/*                 add winter addhoc fix					*/
-						EnableSunsetInv = TRUE_;
+						EnableSunsetInv = true;
 						//nacurr = 15;
 					}
 					if (lt < 0. && nweather == 0 && (dy >= (doublereal) ns3 
 						|| dy <= (doublereal) ns4) ) {
 		/*                 add winter addhoc fix					*/
-						EnableSunsetInv = TRUE_;
+						EnableSunsetInv = true;
 						//nacurr = 15;
 					}
 				}
@@ -2199,7 +2188,7 @@ L700:
 					//add adhoc inversion fix to mishor/ast sunset
 					nacurr = 15;
 				    //t3 += nacurr / 3600.;
-					EnableSunsetInv = FALSE_; //reset flag for next day
+					EnableSunsetInv = false; //reset flag for next day
 				}
 
 				t3sub = t3 + nacurr/3600;
@@ -2295,7 +2284,7 @@ L700:
 /* *************************BEGIN SUNRISE WINTER ADHOC FIX************************ */
 			//new of version 18 -- determine portion of year prone to inversion layers using daylength
 			if (adhocrise) {
-				EnableSunriseInv = FALSE_;
+				EnableSunriseInv = false;
 				if (FindWinter) {
 					DayLength = 2 * sr1;
 					//make sure that it is cold by checking miniimum temperature for the relevant month
@@ -2306,19 +2295,19 @@ L700:
 					mTemp = floor(9 * (kTemp + dy) / 275 + 0.98);
 					if (DayLength <= MaxWinLen) { //&& mint[mTemp-1] <= WinTemp) {
 						//nacurr = -15;
-						EnableSunriseInv = TRUE_;
+						EnableSunriseInv = true;
 					}
 				}else{
 					if (lt >= 0. && nweather == 0 && (dy <= (doublereal) ns3 
 						|| dy >= (doublereal) ns4) ) {
 		/*                 add winter addhoc fix */
-						EnableSunriseInv = TRUE_;
+						EnableSunriseInv = true;
 						//nacurr = -15;
 					}
 					if (lt < 0. && nweather == 0 && (dy >= (doublereal) ns3 
 						|| dy <= (doublereal) ns4) ) {
 		/*                 add winter addhoc fix */
-						EnableSunriseInv = TRUE_;
+						EnableSunriseInv = true;
 						//nacurr = -15;
 					}
 				}
@@ -2358,7 +2347,7 @@ L700:
 					//add adhoc inversion fix to mishor/ast sunrise
 					nacurr = -15;
 				    //t3 += nacurr / 3600.;
-					EnableSunriseInv = FALSE_; //reset flag for next day
+					EnableSunriseInv = false; //reset flag for next day
 				}
 
 				t3sub = t3 + nacurr/3600;
@@ -2582,7 +2571,7 @@ L695:
 					//add adhoc inversion fix to mishor/ast sunset for view angles <= 0
 					nacurr = 15; //this is minimum adhoc inversion fix (hours); can be a lot later
 				    //t3 += nacurr / 3600.;
-					EnableSunsetInv = FALSE_; //reset flag for this day
+					EnableSunsetInv = false; //reset flag for this day
 				}
 
 			    if (nointernet && ! nofiles) {
@@ -2932,7 +2921,7 @@ L760:
 					//add adhoc inversion fix to mishor/ast sunrise for view angles <= 0
 					nacurr = -15; //this is minimum adhoc sunrise inversion fix,(hours); can be a lot earlier
 				    //t3 += nacurr / 3600.;
-					EnableSunriseInv = FALSE_; //reset flag for this day
+					EnableSunriseInv = false; //reset flag for this day
 				}
 
 			    if (nointernet && ! nofiles) {
@@ -4022,7 +4011,7 @@ ErrorHandler:
     static doublereal r__, a2, b2, c1, c2, f1, g1, g2, e4, c3, d1, a3, o1, o2,
 	     a4, b3, s1, s2, b4, c4, c5, x1, y1, y2, x2, c6, d2, r3, r4, r2, 
 	    a5, d3;
-	static logical ggpscorrection = TRUE_;
+	static logical ggpscorrection = true;
 
     g1 = *gn * 1e3f;
     g2 = *ge * 1e3f;
