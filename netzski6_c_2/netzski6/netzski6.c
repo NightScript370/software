@@ -10,14 +10,15 @@
 // the refraction scaling rules are now a function of height and view angle
 ///////////////////////////////////////////////////////////////
 
-// uncomment header files for getch debugging
 #include <math.h>
 #include <stdio.h>
 #include <string.h>
 #include <ctype.h>
-// #include <conio.h> //uncomment for getch() debugging
-#include "f2c.h"
+#ifdef INPUTWAIT
 #include <conio.h>
+#endif
+#include "f2c.h"
+#include <stdlib.h>
 #include <malloc.h>
 #include <stdbool.h>
 
@@ -69,7 +70,7 @@ logical FixProfHgtBug = false; // added 101520 to fix the bug in newreadDTM that
 							   // 030320 -- found that bat file is most reliable recording to height + observer height
 							   //           and even if it errs, it errs to lower height which is better
 
-/* Main program */ int MAIN__(void)
+/* Main program */ int main(void)
 {
 	/* Format strings */
 	// static char fmt_710[] = "(a11,3x,a8,2x,a12,3x,f7.3,3x,f6.2)"
@@ -700,32 +701,18 @@ logical FixProfHgtBug = false; // added 101520 to fix the bug in newreadDTM that
 		ioin__1.innrec = 0;
 		ioin__1.inblank = 0;
 		f_inqu(&ioin__1);
-		if (exists)
-		{
-			o__1.oerr = 0;
-			o__1.ounit = 1;
-			o__1.ofnmlen = 18;
-			o__1.ofnm = filstat;
-			o__1.orl = 0;
-			o__1.osta = "OLD";
-			o__1.oacc = 0;
-			o__1.ofm = 0;
-			o__1.oblnk = 0;
-			f_open(&o__1);
-		}
-		else
-		{
-			o__1.oerr = 0;
-			o__1.ounit = 1;
-			o__1.ofnmlen = 18;
-			o__1.ofnm = filstat;
-			o__1.orl = 0;
-			o__1.osta = "NEW";
-			o__1.oacc = 0;
-			o__1.ofm = 0;
-			o__1.oblnk = 0;
-			f_open(&o__1);
-		}
+
+		o__1.oerr = 0;
+		o__1.ounit = 1;
+		o__1.ofnmlen = 18;
+		o__1.ofnm = filstat;
+		o__1.orl = 0;
+		o__1.osta = (exists ? "OLD" : "NEW");
+		o__1.oacc = 0;
+		o__1.ofm = 0;
+		o__1.oblnk = 0;
+		f_open(&o__1);
+
 		s_wsle(&io___35);
 		do_lio(&c__3, &c__1, (char *)&c__0, (ftnlen)sizeof(integer));
 		e_wsle();
@@ -1626,18 +1613,13 @@ logical FixProfHgtBug = false; // added 101520 to fix the bug in newreadDTM that
 					s_copy(name__, place + (nsetflag << 3), (ftnlen)4, (ftnlen)4);
 					s_copy(name__ + 4, ch4, (ftnlen)4, (ftnlen)4);
 				}
-				if (nsetflag == 0)
-				{
+
+				if (nsetflag == 0 || nsetflag == 1) {
 					*(unsigned char *)namet = *(unsigned char *)drivlet;
-					s_copy(namet + 1, ":/fordtm/netz/", (ftnlen)14, (ftnlen)14);
+					s_copy(namet + 1, (nsetflag == 0 ? ":/fordtm/netz/" : ":/fordtm/skiy/"), (ftnlen)14, (ftnlen)14);
 					s_copy(namet + 15, name__, (ftnlen)8, (ftnlen)8);
 				}
-				else if (nsetflag == 1)
-				{
-					*(unsigned char *)namet = *(unsigned char *)drivlet;
-					s_copy(namet + 1, ":/fordtm/skiy/", (ftnlen)14, (ftnlen)14);
-					s_copy(namet + 15, name__, (ftnlen)8, (ftnlen)8);
-				}
+
 				s_copy(plcfil, namet, (ftnlen)23, (ftnlen)23);
 				s_copy(plcfil + 23, ext1 + (nsetflag + 1 + (nplac[nsetflag] << 1) - 3 << 2), (ftnlen)4, (ftnlen)4);
 				ioin__1.inerr = 0;
@@ -1658,32 +1640,18 @@ logical FixProfHgtBug = false; // added 101520 to fix the bug in newreadDTM that
 				ioin__1.innrec = 0;
 				ioin__1.inblank = 0;
 				f_inqu(&ioin__1);
-				if (exists)
-				{
-					o__1.oerr = 0;
-					o__1.ounit = 1;
-					o__1.ofnmlen = 23;
-					o__1.ofnm = namet;
-					o__1.orl = 0;
-					o__1.osta = "OLD";
-					o__1.oacc = 0;
-					o__1.ofm = 0;
-					o__1.oblnk = 0;
-					f_open(&o__1);
-				}
-				else
-				{
-					o__1.oerr = 0;
-					o__1.ounit = 1;
-					o__1.ofnmlen = 23;
-					o__1.ofnm = namet;
-					o__1.orl = 0;
-					o__1.osta = "NEW";
-					o__1.oacc = 0;
-					o__1.ofm = 0;
-					o__1.oblnk = 0;
-					f_open(&o__1);
-				}
+
+				o__1.oerr = 0;
+				o__1.ounit = 1;
+				o__1.ofnmlen = 23;
+				o__1.ofnm = namet;
+				o__1.orl = 0;
+				o__1.osta = (exists ? "OLD" : "NEW");
+				o__1.oacc = 0;
+				o__1.ofm = 0;
+				o__1.oblnk = 0;
+				f_open(&o__1);
+
 				ioin__1.inerr = 0;
 				ioin__1.infilen = 27;
 				ioin__1.infile = plcfil;
@@ -1702,32 +1670,17 @@ logical FixProfHgtBug = false; // added 101520 to fix the bug in newreadDTM that
 				ioin__1.innrec = 0;
 				ioin__1.inblank = 0;
 				f_inqu(&ioin__1);
-				if (exists)
-				{
-					o__1.oerr = 0;
-					o__1.ounit = 2;
-					o__1.ofnmlen = 27;
-					o__1.ofnm = plcfil;
-					o__1.orl = 0;
-					o__1.osta = "OLD";
-					o__1.oacc = 0;
-					o__1.ofm = 0;
-					o__1.oblnk = 0;
-					f_open(&o__1);
-				}
-				else
-				{
-					o__1.oerr = 0;
-					o__1.ounit = 2;
-					o__1.ofnmlen = 27;
-					o__1.ofnm = plcfil;
-					o__1.orl = 0;
-					o__1.osta = "NEW";
-					o__1.oacc = 0;
-					o__1.ofm = 0;
-					o__1.oblnk = 0;
-					f_open(&o__1);
-				}
+
+				o__1.oerr = 0;
+				o__1.ounit = 2;
+				o__1.ofnmlen = 27;
+				o__1.ofnm = plcfil;
+				o__1.orl = 0;
+				o__1.osta = (exists ? "OLD" : "NEW");
+				o__1.oacc = 0;
+				o__1.ofm = 0;
+				o__1.oblnk = 0;
+				f_open(&o__1);
 			}
 			td = geotd;
 			/*       time difference from Greenwich England */
@@ -1757,44 +1710,22 @@ logical FixProfHgtBug = false; // added 101520 to fix the bug in newreadDTM that
 			/*       year for calculation */
 			nyd = nyr - 1996;
 			nyf = 0;
-			if (nyd < 0)
-			{
-				i__3 = nyr;
-				for (nyri = 1995; nyri >= i__3; --nyri)
-				{
-					nyrtst = nyri;
-					nyltst = 365;
-					if (nyrtst % 4 == 0)
-					{
-						nyltst = 366;
-					}
-					if (nyrtst % 100 == 0 && nyrtst % 400 != 0)
-					{
-						nyltst = 365;
-					}
-					nyf -= nyltst;
-					/* L100: */
+
+			bool oneAdjust = (nyd < 0);
+			i__3 = nyr - (oneAdjust ? 1 : 0);
+			for (nyri = 1995 + (oneAdjust ? 1 : 0); nyri >= i__3; --nyri) {
+				nyrtst = nyri;
+				nyltst = 365;
+				if (nyrtst % 4 == 0) {
+					nyltst = 366;
 				}
-			}
-			else if (nyd >= 0)
-			{
-				i__3 = nyr - 1;
-				for (nyri = 1996; nyri <= i__3; ++nyri)
-				{
-					nyrtst = nyri;
+				if (nyrtst % 100 == 0 && nyrtst % 400 != 0) {
 					nyltst = 365;
-					if (nyrtst % 4 == 0)
-					{
-						nyltst = 366;
-					}
-					if (nyrtst % 100 == 0 && nyrtst % 400 != 0)
-					{
-						nyltst = 365;
-					}
-					nyf += nyltst;
-					/* L150: */
 				}
+				nyf -= nyltst;
+				/* L100: */
 			}
+
 			nyl = 365;
 			if (nyr % 4 == 0)
 			{
@@ -1807,47 +1738,19 @@ logical FixProfHgtBug = false; // added 101520 to fix the bug in newreadDTM that
 			nyf += -1462;
 			ob += ob1 * nyf;
 			mp += nyf * mc;
-		L600:
-			if (mp < 0.)
-			{
+			while (mp < 0.) {
 				mp += pi * 2.;
 			}
-			/* L610: */
-			if (mp < 0.)
-			{
-				goto L600;
-			}
-		L620:
-			if (mp > pi * 2.)
-			{
+			while (mp > pi * 2.) {
 				mp -= pi * 2.;
-			}
-			/* L630: */
-			if (mp > pi * 2.)
-			{
-				goto L620;
 			}
 			/* L640: */
 			ap += nyf * ac;
-		L650:
-			if (ap < 0.)
-			{
+			while (ap < 0.) {
 				ap += pi * 2.;
 			}
-			/* L660: */
-			if (ap < 0.)
-			{
-				goto L650;
-			}
-		L670:
-			if (ap > pi * 2.)
-			{
+			while (ap > pi * 2.) {
 				ap -= pi * 2.;
-			}
-			/* L680: */
-			if (ap > pi * 2.)
-			{
-				goto L670;
 			}
 			d__1 = (doublereal)yrend[nyear - nstrtyr];
 			for (dy = (doublereal)yrst[nyear - nstrtyr]; dy <= d__1; dy +=
@@ -1954,7 +1857,9 @@ logical FixProfHgtBug = false; // added 101520 to fix the bug in newreadDTM that
 									if (Diagnostics)
 									{
 										printf("found temperature dy, yr, Tobs, p, tmin = %f, %d, %f, %f, %f\n", dy, nyear, tk, p, tkmin);
+										#ifdef INPUTWAIT
 										getch();
+										#endif
 										showCalc = true; // flag to show the details of the calculation and compare for using just tk
 										nloops_2 = 0;
 									}
@@ -2081,32 +1986,18 @@ logical FixProfHgtBug = false; // added 101520 to fix the bug in newreadDTM that
 						ioin__1.innrec = 0;
 						ioin__1.inblank = 0;
 						f_inqu(&ioin__1);
-						if (exists)
-						{
-							o__1.oerr = 0;
-							o__1.ounit = 3;
-							o__1.ofnmlen = 18;
-							o__1.ofnm = filstat;
-							o__1.orl = 0;
-							o__1.osta = "OLD";
-							o__1.oacc = 0;
-							o__1.ofm = 0;
-							o__1.oblnk = 0;
-							f_open(&o__1);
-						}
-						else
-						{
-							o__1.oerr = 0;
-							o__1.ounit = 3;
-							o__1.ofnmlen = 18;
-							o__1.ofnm = filstat;
-							o__1.orl = 0;
-							o__1.osta = "NEW";
-							o__1.oacc = 0;
-							o__1.ofm = 0;
-							o__1.oblnk = 0;
-							f_open(&o__1);
-						}
+
+						o__1.oerr = 0;
+						o__1.ounit = 3;
+						o__1.ofnmlen = 18;
+						o__1.ofnm = filstat;
+						o__1.orl = 0;
+						o__1.osta = (exists ? "OLD" : "NEW");
+						o__1.oacc = 0;
+						o__1.ofm = 0;
+						o__1.oblnk = 0;
+						f_open(&o__1);
+
 						s_wsfe(&io___155);
 						do_fio(&c__1, (char *)&stat2, (ftnlen)sizeof(doublereal));
 						e_wsfe();
@@ -2126,8 +2017,7 @@ logical FixProfHgtBug = false; // added 101520 to fix the bug in newreadDTM that
 					ra += pi;
 				}
 				df = ms - ra;
-			L685:
-				if (abs(df) > pi * .5)
+				while (abs(df) > pi * .5)
 				{
 					if (df > 0.)
 					{
@@ -2138,12 +2028,6 @@ logical FixProfHgtBug = false; // added 101520 to fix the bug in newreadDTM that
 						df += df / abs(df) * pi;
 					}
 				}
-				else
-				{
-					goto L687;
-				}
-				goto L685;
-			L687:
 				et = df / cd * 4.;
 				/*          equation of time (minutes) */
 				t6 = tf + 720. - et;
@@ -3071,7 +2955,9 @@ logical FixProfHgtBug = false; // added 101520 to fix the bug in newreadDTM that
 									{
 										printf("nloops = %d\n", nloops);
 										printf("difference in time is: %d seconds\n", nloops - nloops_2);
+										#ifdef INPUTWAIT
 										getch();
+										#endif
 									}
 								}
 
@@ -3362,133 +3248,110 @@ logical FixProfHgtBug = false; // added 101520 to fix the bug in newreadDTM that
 	i__1 = nset2;
 	for (nsetflag = nset1; nsetflag <= i__1; ++nsetflag)
 	{
-		if (nsetflag == 0)
+		if (nsetflag == 0 || nsetflag == 1)
 		{
 			*(unsigned char *)filout = *(unsigned char *)drivlet;
-			s_copy(filout + 1, ":/fordtm/netz/", (ftnlen)14, (ftnlen)14);
-			nadd = 0;
-		}
-		else if (nsetflag == 1)
-		{
-			*(unsigned char *)filout = *(unsigned char *)drivlet;
-			s_copy(filout + 1, ":/fordtm/skiy/", (ftnlen)14, (ftnlen)14);
-			nadd = 1;
-		}
-		if (nplac[nsetflag] == 1 && (nofiles || nointernet))
-		{
-			goto L2500;
+			s_copy(filout + 1, (nsetflag == 0 ? ":/fordtm/netz/" : ":/fordtm/skiy/"), (ftnlen)14, (ftnlen)14);
+			nadd = nsetflag;
 		}
 
-		i__2 = nendyr;
-		for (nyr = nstrtyr; nyr <= i__2; ++nyr)
+		if (!(nplac[nsetflag] == 1 && (nofiles || nointernet)))
 		{
-			nyrstp = nyr - nstrtyr + 1;
-			/*             determine number of days in this year */
-			nyl = 365;
-			if (nyr % 4 == 0)
+			i__2 = nendyr;
+			for (nyr = nstrtyr; nyr <= i__2; ++nyr)
 			{
-				nyl = 366;
-			}
-			if (nyr % 100 == 0 && nyr % 400 != 0)
-			{
+				nyrstp = nyr - nstrtyr + 1;
+				/*             determine number of days in this year */
 				nyl = 365;
-			}
-			nyr1 = nyr;
-			if (abs(nyr1) < 1000)
-			{
-				nyr1 = abs(nyr1) + 1000;
-			}
-			s_wsfi(&io___243);
-			i__4 = abs(nyr1);
-			do_fio(&c__1, (char *)&i__4, (ftnlen)sizeof(integer));
-			e_wsfi();
-			s_copy(filout + 15, cn4, (ftnlen)4, (ftnlen)4);
-			s_copy(filout + 19, ch4, (ftnlen)4, (ftnlen)4);
-			nleapyr = 0;
-			if (nyl == 366)
-			{
-				nleapyr = 1;
-			}
-			s_copy(filout + 23, ".com", (ftnlen)4, (ftnlen)4);
-			ioin__1.inerr = 0;
-			ioin__1.infilen = 27;
-			ioin__1.infile = filout;
-			ioin__1.inex = &exists;
-			ioin__1.inopen = 0;
-			ioin__1.innum = 0;
-			ioin__1.innamed = 0;
-			ioin__1.inname = 0;
-			ioin__1.inacc = 0;
-			ioin__1.inseq = 0;
-			ioin__1.indir = 0;
-			ioin__1.infmt = 0;
-			ioin__1.inform = 0;
-			ioin__1.inunf = 0;
-			ioin__1.inrecl = 0;
-			ioin__1.innrec = 0;
-			ioin__1.inblank = 0;
-			f_inqu(&ioin__1);
-			if (exists)
-			{
+				if (nyr % 4 == 0)
+				{
+					nyl = 366;
+				}
+				if (nyr % 100 == 0 && nyr % 400 != 0)
+				{
+					nyl = 365;
+				}
+				nyr1 = nyr;
+				if (abs(nyr1) < 1000)
+				{
+					nyr1 = abs(nyr1) + 1000;
+				}
+				s_wsfi(&io___243);
+				i__4 = abs(nyr1);
+				do_fio(&c__1, (char *)&i__4, (ftnlen)sizeof(integer));
+				e_wsfi();
+				s_copy(filout + 15, cn4, (ftnlen)4, (ftnlen)4);
+				s_copy(filout + 19, ch4, (ftnlen)4, (ftnlen)4);
+				nleapyr = 0;
+				if (nyl == 366)
+				{
+					nleapyr = 1;
+				}
+				s_copy(filout + 23, ".com", (ftnlen)4, (ftnlen)4);
+				ioin__1.inerr = 0;
+				ioin__1.infilen = 27;
+				ioin__1.infile = filout;
+				ioin__1.inex = &exists;
+				ioin__1.inopen = 0;
+				ioin__1.innum = 0;
+				ioin__1.innamed = 0;
+				ioin__1.inname = 0;
+				ioin__1.inacc = 0;
+				ioin__1.inseq = 0;
+				ioin__1.indir = 0;
+				ioin__1.infmt = 0;
+				ioin__1.inform = 0;
+				ioin__1.inunf = 0;
+				ioin__1.inrecl = 0;
+				ioin__1.innrec = 0;
+				ioin__1.inblank = 0;
+				f_inqu(&ioin__1);
+
 				o__1.oerr = 0;
 				o__1.ounit = 1;
 				o__1.ofnmlen = 27;
 				o__1.ofnm = filout;
 				o__1.orl = 0;
-				o__1.osta = "OLD";
+				o__1.osta = (exists ? "OLD" : "NEW");
 				o__1.oacc = 0;
 				o__1.ofm = 0;
 				o__1.oblnk = 0;
 				f_open(&o__1);
+
+				i1 = yrst[nyr - nstrtyr];
+				i2 = yrend[nyr - nstrtyr];
+				i__4 = i2;
+				for (i__ = i1; i__ <= i__4; ++i__)
+				{
+					/*              convert daynumber to date */
+					d__1 = (doublereal)i__;
+					t1750_(&d__1, &nyl, &nyr);
+					s_copy(dat, t3s_1.caldayc, (ftnlen)11, (ftnlen)11);
+					/*              convert fractional hour to time */
+					t3sub = tsscs[nsetflag + 1 + (nyrstp + (i__ << 1) << 1) - 7];
+					t1500_(&t3sub, &negch);
+					s_copy(timss, t3s_1.t3subc, (ftnlen)8, (ftnlen)8);
+					s_copy(comentss, coments + (nsetflag + 1 + (nyrstp + (i__ << 1) << 1) - 7) * 12, (ftnlen)12, (ftnlen)12);
+					azinss = azils[nsetflag + 1 + (nyrstp + (i__ << 1) << 1) - 7];
+					dobsf = dobss[nsetflag + 1 + (nyrstp + (i__ << 1) << 1) - 7];
+					viewangf = viewang[nsetflag + 1 + (nyrstp + (i__ << 1) << 1) - 7];
+					s_wsfe(&io___251);
+					do_fio(&c__1, dat, (ftnlen)11);
+					do_fio(&c__1, timss, (ftnlen)8);
+					do_fio(&c__1, comentss, (ftnlen)12);
+					do_fio(&c__1, (char *)&azinss, (ftnlen)sizeof(real));
+					do_fio(&c__1, (char *)&viewangf, (ftnlen)sizeof(doublereal)); //////added 081021 /////////////
+					do_fio(&c__1, (char *)&dobsf, (ftnlen)sizeof(doublereal));
+					e_wsfe();
+					/* L1500: */
+				}
+				/* L2000: */
 			}
-			else
-			{
-				o__1.oerr = 0;
-				o__1.ounit = 1;
-				o__1.ofnmlen = 27;
-				o__1.ofnm = filout;
-				o__1.orl = 0;
-				o__1.osta = "NEW";
-				o__1.oacc = 0;
-				o__1.ofm = 0;
-				o__1.oblnk = 0;
-				f_open(&o__1);
-			}
-			i1 = yrst[nyr - nstrtyr];
-			i2 = yrend[nyr - nstrtyr];
-			i__4 = i2;
-			for (i__ = i1; i__ <= i__4; ++i__)
-			{
-				/*              convert daynumber to date */
-				d__1 = (doublereal)i__;
-				t1750_(&d__1, &nyl, &nyr);
-				s_copy(dat, t3s_1.caldayc, (ftnlen)11, (ftnlen)11);
-				/*              convert fractional hour to time */
-				t3sub = tsscs[nsetflag + 1 + (nyrstp + (i__ << 1) << 1) - 7];
-				t1500_(&t3sub, &negch);
-				s_copy(timss, t3s_1.t3subc, (ftnlen)8, (ftnlen)8);
-				s_copy(comentss, coments + (nsetflag + 1 + (nyrstp + (i__ << 1) << 1) - 7) * 12, (ftnlen)12, (ftnlen)12);
-				azinss = azils[nsetflag + 1 + (nyrstp + (i__ << 1) << 1) - 7];
-				dobsf = dobss[nsetflag + 1 + (nyrstp + (i__ << 1) << 1) - 7];
-				viewangf = viewang[nsetflag + 1 + (nyrstp + (i__ << 1) << 1) - 7];
-				s_wsfe(&io___251);
-				do_fio(&c__1, dat, (ftnlen)11);
-				do_fio(&c__1, timss, (ftnlen)8);
-				do_fio(&c__1, comentss, (ftnlen)12);
-				do_fio(&c__1, (char *)&azinss, (ftnlen)sizeof(real));
-				do_fio(&c__1, (char *)&viewangf, (ftnlen)sizeof(doublereal)); //////added 081021 /////////////
-				do_fio(&c__1, (char *)&dobsf, (ftnlen)sizeof(doublereal));
-				e_wsfe();
-				/* L1500: */
-			}
-			/* L2000: */
+			cl__1.cerr = 0;
+			cl__1.cunit = 1;
+			cl__1.csta = 0;
+			f_clos(&cl__1);
 		}
-		cl__1.cerr = 0;
-		cl__1.cunit = 1;
-		cl__1.csta = 0;
-		f_clos(&cl__1);
-		goto L2500;
-	L2500:
 		s_copy(filout + 15, "NETZSKIY.TM2", (ftnlen)12, (ftnlen)12);
 		ioin__1.inerr = 0;
 		ioin__1.infilen = 27;
@@ -3508,44 +3371,22 @@ logical FixProfHgtBug = false; // added 101520 to fix the bug in newreadDTM that
 		ioin__1.innrec = 0;
 		ioin__1.inblank = 0;
 		f_inqu(&ioin__1);
-		if (exists)
-		{
-			o__1.oerr = 0;
-			o__1.ounit = 3;
-			o__1.ofnmlen = 27;
-			o__1.ofnm = filout;
-			o__1.orl = 0;
-			o__1.osta = "OLD";
-			o__1.oacc = 0;
-			o__1.ofm = 0;
-			o__1.oblnk = 0;
-			f_open(&o__1);
-		}
-		else
-		{
-			o__1.oerr = 0;
-			o__1.ounit = 3;
-			o__1.ofnmlen = 27;
-			o__1.ofnm = filout;
-			o__1.orl = 0;
-			o__1.osta = "NEW";
-			o__1.oacc = 0;
-			o__1.ofm = 0;
-			o__1.oblnk = 0;
-			f_open(&o__1);
-		}
-		if (nplac[nsetflag] < 10)
-		{
-			s_wsfe(&io___252);
-			do_fio(&c__1, (char *)&nplac[nsetflag], (ftnlen)sizeof(integer));
-			e_wsfe();
-		}
-		else
-		{
-			s_wsfe(&io___253);
-			do_fio(&c__1, (char *)&nplac[nsetflag], (ftnlen)sizeof(integer));
-			e_wsfe();
-		}
+
+		o__1.oerr = 0;
+		o__1.ounit = 3;
+		o__1.ofnmlen = 27;
+		o__1.ofnm = filout;
+		o__1.orl = 0;
+		o__1.osta = (exists ? "OLD" : "NEW");
+		o__1.oacc = 0;
+		o__1.ofm = 0;
+		o__1.oblnk = 0;
+		f_open(&o__1);
+
+		s_wsfe((nplac[nsetflag] < 10) ? &io___252 : &io___253);
+		do_fio(&c__1, (char *)&nplac[nsetflag], (ftnlen)sizeof(integer));
+		e_wsfe();
+
 		i__2 = nendyr;
 		for (nyr = nstrtyr; nyr <= i__2; ++nyr)
 		{
@@ -3555,27 +3396,24 @@ logical FixProfHgtBug = false; // added 101520 to fix the bug in newreadDTM that
 			e_wsfi();
 			if (nplac[nsetflag] == 1 && (nofiles || nointernet))
 			{
-				goto L2600;
+				s_copy(plcfil, filout, (ftnlen)15, (ftnlen)15);
+				s_copy(plcfil + 19, ch4, (ftnlen)4, (ftnlen)4);
+				s_copy(plcfil + 23, ext1 + (nsetflag + 1 + (nplac[nsetflag] << 1) - 3 << 2), (ftnlen)4, (ftnlen)4);
+				s_copy(plcfil + 15, place + (nsetflag << 3), (ftnlen)4, (ftnlen)4);
+				s_wsfe(&io___256);
+				do_fio(&c__1, "\"", (ftnlen)1);
+				do_fio(&c__1, plcfil, (ftnlen)27);
+				do_fio(&c__1, "\"", (ftnlen)1);
+				e_wsfe();
+			} else {
+				s_copy(filout + 19, ch4, (ftnlen)4, (ftnlen)4);
+				s_copy(filout + 23, ".com", (ftnlen)4, (ftnlen)4);
+				s_wsfe(&io___255);
+				do_fio(&c__1, "\"", (ftnlen)1);
+				do_fio(&c__1, filout, (ftnlen)27);
+				do_fio(&c__1, "\"", (ftnlen)1);
+				e_wsfe();
 			}
-			s_copy(filout + 19, ch4, (ftnlen)4, (ftnlen)4);
-			s_copy(filout + 23, ".com", (ftnlen)4, (ftnlen)4);
-			s_wsfe(&io___255);
-			do_fio(&c__1, "\"", (ftnlen)1);
-			do_fio(&c__1, filout, (ftnlen)27);
-			do_fio(&c__1, "\"", (ftnlen)1);
-			e_wsfe();
-			goto L2700;
-		L2600:
-			s_copy(plcfil, filout, (ftnlen)15, (ftnlen)15);
-			s_copy(plcfil + 19, ch4, (ftnlen)4, (ftnlen)4);
-			s_copy(plcfil + 23, ext1 + (nsetflag + 1 + (nplac[nsetflag] << 1) - 3 << 2), (ftnlen)4, (ftnlen)4);
-			s_copy(plcfil + 15, place + (nsetflag << 3), (ftnlen)4, (ftnlen)4);
-			s_wsfe(&io___256);
-			do_fio(&c__1, "\"", (ftnlen)1);
-			do_fio(&c__1, plcfil, (ftnlen)27);
-			do_fio(&c__1, "\"", (ftnlen)1);
-			e_wsfe();
-		L2700:;
 		}
 		cl__1.cerr = 0;
 		cl__1.cunit = 3;
@@ -3606,37 +3444,22 @@ logical FixProfHgtBug = false; // added 101520 to fix the bug in newreadDTM that
 	ioin__1.innrec = 0;
 	ioin__1.inblank = 0;
 	f_inqu(&ioin__1);
-	if (exists)
-	{
-		o__1.oerr = 0;
-		o__1.ounit = 1;
-		o__1.ofnmlen = 18;
-		o__1.ofnm = filstat;
-		o__1.orl = 0;
-		o__1.osta = "OLD";
-		o__1.oacc = 0;
-		o__1.ofm = 0;
-		o__1.oblnk = 0;
-		f_open(&o__1);
-	}
-	else
-	{
-		o__1.oerr = 0;
-		o__1.ounit = 1;
-		o__1.ofnmlen = 18;
-		o__1.ofnm = filstat;
-		o__1.orl = 0;
-		o__1.osta = "NEW";
-		o__1.oacc = 0;
-		o__1.ofm = 0;
-		o__1.oblnk = 0;
-		f_open(&o__1);
-	}
+
+	o__1.oerr = 0;
+	o__1.ounit = 1;
+	o__1.ofnmlen = 18;
+	o__1.ofnm = filstat;
+	o__1.orl = 0;
+	o__1.osta = (exists ? "OLD" : "NEW");
+	o__1.oacc = 0;
+	o__1.ofm = 0;
+	o__1.oblnk = 0;
+	f_open(&o__1);
+
 	cl__1.cerr = 0;
 	cl__1.cunit = 1;
 	cl__1.csta = 0;
 	f_clos(&cl__1);
-L9999:
 	exit(0);
 	// return 0;
 
@@ -4203,18 +4026,14 @@ ErrorHandler:;
 	y2 = g1;
 	/*       GN & GE */
 	x2 = g2;
-	if (x2 > 7e5f)
+	if (!(x2 > 7e5f))
 	{
-		goto L5;
+		x1 += -1e6f;
 	}
-	x1 += -1e6f;
-L5:
-	if (y2 > 5.5e5f)
+	if (!(y2 > 5.5e5f))
 	{
-		goto L10;
+		y1 += -1e6f;
 	}
-	y1 += -1e6f;
-L10:
 	x1 = x2 - x1;
 	y1 = y2 - y1;
 	d1 = y1 * b2 / 2.f;
@@ -4262,12 +4081,7 @@ L10:
 	return 0;
 } /* casgeo_ */
 
-/* Main program alias */ int netzski6_()
-{
-	MAIN__();
-	return 0;
-}
-
+enum TemperatureModes { MinimumTemperature, AverageTemperature, MaximumTemperature};
 short Temperatures(double lt, double lg, integer MinTemp[], integer AvgTemp[], integer MaxTemp[])
 {
 
@@ -4286,7 +4100,8 @@ short Temperatures(double lt, double lg, integer MinTemp[], integer AvgTemp[], i
 	char FileNameBil[255] = "";
 
 	int tncols, IKMY, IKMX, numrec, pos, i;
-	short IO = 0, Tempmode = 0;
+	short IO = 0;
+	enum TemperatureModes Tempmode = MinimumTemperature;
 	double X, Y;
 	// short MinTemp[12], AvgTemp[12];
 
@@ -4310,116 +4125,112 @@ short Temperatures(double lt, double lg, integer MinTemp[], integer AvgTemp[], i
 
 	// first extract minimum temperatures, then average temperatures
 
-T50:
-
-	if (Tempmode == 0)
-	{ // read the minimum temperatures for this lat,lon
-		strcat(FilePathBil, "//min_");
-	}
-	else if (Tempmode == 1)
-	{ // read the average temperatures for this lat, lon
-		strcpy(FilePathBil, "c:\\DevStudio\\Vb\\WorldClim_bil");
-		strcat(FilePathBil, "//avg_");
-	}
-	else if (Tempmode == 2)
-	{ // read the maximum temperatures for this lat, lon
-		strcpy(FilePathBil, "c:\\DevStudio\\Vb\\WorldClim_bil");
-		strcat(FilePathBil, "//max_");
-	}
-
-	for (i = 1; i <= 12; i++)
-	{
-
-		strcpy(FileNameBil, FilePathBil);
-
-		switch (i)
-		{
-		case 1:
-			strcat(FileNameBil, "Jan");
-			break;
-		case 2:
-			strcat(FileNameBil, "Feb");
-			break;
-		case 3:
-			strcat(FileNameBil, "Mar");
-			break;
-		case 4:
-			strcat(FileNameBil, "Apr");
-			break;
-		case 5:
-			strcat(FileNameBil, "May");
-			break;
-		case 6:
-			strcat(FileNameBil, "Jun");
-			break;
-		case 7:
-			strcat(FileNameBil, "Jul");
-			break;
-		case 8:
-			strcat(FileNameBil, "Aug");
-			break;
-		case 9:
-			strcat(FileNameBil, "Sep");
-			break;
-		case 10:
-			strcat(FileNameBil, "Oct");
-			break;
-		case 11:
-			strcat(FileNameBil, "Nov");
-			break;
-		case 12:
-			strcat(FileNameBil, "Dec");
-			break;
+	while (true) {
+		if (Tempmode == MinimumTemperature)
+		{ // read the minimum temperatures for this lat,lon
+			strcat(FilePathBil, "//min_");
+		}
+		else if (Tempmode == AverageTemperature)
+		{ // read the average temperatures for this lat, lon
+			strcpy(FilePathBil, "c:\\DevStudio\\Vb\\WorldClim_bil");
+			strcat(FilePathBil, "//avg_");
+		}
+		else if (Tempmode == MaximumTemperature)
+		{ // read the maximum temperatures for this lat, lon
+			strcpy(FilePathBil, "c:\\DevStudio\\Vb\\WorldClim_bil");
+			strcat(FilePathBil, "//max_");
 		}
 
-		strcat(FileNameBil, ".bil");
-
-		if ((stream = fopen((const char *)FileNameBil, "rb")) != NULL)
+		for (i = 1; i <= 12; i++)
 		{
 
-			Y = lt;
-			X = lg;
+			strcpy(FileNameBil, FilePathBil);
 
-			IKMY = Cint((ULYMAP - Y) / YDIM) + 1;
-			IKMX = Cint((X - ULXMAP) / XDIM) + 1;
-			tncols = NCOLS;
-			numrec = (IKMY - 1) * tncols + IKMX - 1;
-			pos = fseek(stream, numrec * 2L, SEEK_SET);
-			fread(&IO, 2L, 1, stream);
+			switch (i)
+			{
+			case 1:
+				strcat(FileNameBil, "Jan");
+				break;
+			case 2:
+				strcat(FileNameBil, "Feb");
+				break;
+			case 3:
+				strcat(FileNameBil, "Mar");
+				break;
+			case 4:
+				strcat(FileNameBil, "Apr");
+				break;
+			case 5:
+				strcat(FileNameBil, "May");
+				break;
+			case 6:
+				strcat(FileNameBil, "Jun");
+				break;
+			case 7:
+				strcat(FileNameBil, "Jul");
+				break;
+			case 8:
+				strcat(FileNameBil, "Aug");
+				break;
+			case 9:
+				strcat(FileNameBil, "Sep");
+				break;
+			case 10:
+				strcat(FileNameBil, "Oct");
+				break;
+			case 11:
+				strcat(FileNameBil, "Nov");
+				break;
+			case 12:
+				strcat(FileNameBil, "Dec");
+				break;
+			}
 
-			if (IO == NODATA)
-				IO = 0;
-			if (Tempmode == 0)
-			{
-				MinTemp[i - 1] = IO;
-			}
-			else if (Tempmode == 1)
-			{
-				AvgTemp[i - 1] = IO;
-			}
-			else if (Tempmode == 2)
-			{
-				MaxTemp[i - 1] = IO;
-			}
+			strcat(FileNameBil, ".bil");
 
-			fclose(stream);
+			if ((stream = fopen((const char *)FileNameBil, "rb")) != NULL)
+			{
+
+				Y = lt;
+				X = lg;
+
+				IKMY = Cint((ULYMAP - Y) / YDIM) + 1;
+				IKMX = Cint((X - ULXMAP) / XDIM) + 1;
+				tncols = NCOLS;
+				numrec = (IKMY - 1) * tncols + IKMX - 1;
+				pos = fseek(stream, numrec * 2L, SEEK_SET);
+				fread(&IO, 2L, 1, stream);
+
+				if (IO == NODATA)
+					IO = 0;
+				if (Tempmode == MinimumTemperature)
+				{
+					MinTemp[i - 1] = IO;
+				}
+				else if (Tempmode == AverageTemperature)
+				{
+					AvgTemp[i - 1] = IO;
+				}
+				else if (Tempmode == MaximumTemperature)
+				{
+					MaxTemp[i - 1] = IO;
+				}
+
+				fclose(stream);
+			}
+			else
+			{
+				return -1;
+			}
 		}
-		else
+
+		// now go back and calculate the AvgTemps
+		if (Tempmode == MinimumTemperature || Tempmode == AverageTemperature)
 		{
-			return -1;
+			Tempmode += 1;
+		} else {
+			break;
 		}
-	}
-
-	// now go back and calculate the AvgTemps
-	if (Tempmode == 0)
-	{
-		Tempmode = 1;
-		goto T50;
-	}
-	else if (Tempmode == 1)
-	{
-		Tempmode = 2;
-		goto T50;
 	}
 
 	return 0;
